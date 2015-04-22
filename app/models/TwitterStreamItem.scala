@@ -2,6 +2,8 @@ package models
 
 import org.joda.time.DateTime
 
+import java.net.URL
+
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._ 
@@ -43,15 +45,19 @@ object StallWarning {
 
 }
 
-case class Tweet(id: Long, createdAt: DateTime, hashtags: Seq[String], urls: Seq[String], text: String) extends TwitterStreamItem
+case class Tweet(id: Long, createdAt: DateTime, hashtags: Seq[String], urls: Seq[URL], text: String) extends TwitterStreamItem {
+  lazy val domains = urls.map(_.getHost)
+}
 
 object Tweet {
+
+  implicit val urlReads: Reads[URL] = of[String].map(new URL(_))
 
   implicit val rds: Reads[Tweet] = (
     (__ \ "id").read[Long] and
     (__ \ "created_at").read[DateTime] and
     (__ \ "entities" \ "hashtags").read[Seq[String]] and
-    (__ \ "entities" \ "urls").read[Seq[String]] and
+    (__ \ "entities" \ "urls").read[Seq[URL]] and
     (__ \ "text").read[String]
   )(Tweet.apply _)
 

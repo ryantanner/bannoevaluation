@@ -61,3 +61,14 @@ object TopDomains {
     (__ \ "top_domains").write[Set[String]].contramap(_.heavyHitters)
 
 }
+
+case class URLStats(percentContainingURLs: Double, percentContainingPhotoURLs: Double)
+
+object URLStats {
+
+  implicit val writes = (
+    (__ \ "percent_containing_urls").write[Double] ~
+    (__ \ "percent_containing_photo_urls").write[Double]
+  )(unlift(URLStats.unapply))
+
+}

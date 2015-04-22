@@ -2,6 +2,8 @@ package helpers
 
 import org.joda.time.DateTime
 
+import java.net.URL
+
 import com.vdurmont.emoji.{ Emoji, EmojiManager}
 import collection.JavaConverters._
 
@@ -9,7 +11,7 @@ import models._
 
 object Samples {
 
-  val sampleTweet = Tweet(42l, DateTime.now, Seq("akka"), Seq("http://scala-lang.org"), "Banno Evaluation using #akka")
+  val sampleTweet = Tweet(42l, DateTime.now, Seq("akka"), Seq(new URL("http://scala-lang.org")), "Banno Evaluation using #akka")
 
   val emojis = EmojiManager.getAll().asScala.take(10).toList
 

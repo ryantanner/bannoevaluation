@@ -45,19 +45,15 @@ object TwitterSample extends Controller {
     request[TopHashtags](actors.hashtags)
   }
 
-  def percentContainingUrl = Action {
-    NotImplemented
+  def urlStats = Action.async {
+    request[URLStats](actors.urls)
   }
 
-  def percentContainingPhotoUrl = Action {
-    NotImplemented
+  def topDomains = Action.async {
+    request[TopDomains](actors.topDomains)
   }
 
-  def topDomains = Action {
-    NotImplemented
-  }
-
-  def request[T : ClassTag : Writes](ref: ActorRef): Future[Result] = {
+  private def request[T : ClassTag : Writes](ref: ActorRef): Future[Result] = {
     for {
       data <- (ref ? RequestData).mapTo[T]
     } yield {

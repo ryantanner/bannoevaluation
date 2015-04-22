@@ -5,6 +5,8 @@ import org.scalatestplus.play._
 
 import play.api.libs.json._
 
+import java.net.URL
+
 import controllers._
 import models._
 import plugins._
@@ -92,6 +94,39 @@ class TwitterSampleSpec extends PlaySpec with OneAppPerSuite {
       (contentAsJson(result) \ "top_hashtags").as[Set[String]] mustBe (
         Set("akka", "scala", "banno")
       )
+    }
+
+    "return top domains" in {
+      component.topDomains ! sampleTweet
+      component.topDomains ! sampleTweet.copy(urls = Nil)
+      component.topDomains ! sampleTweet.copy(urls = Seq(new URL("http://google.com"), new URL("http://twitter.com")))
+      component.topDomains ! sampleTweet.copy(urls = Seq(new URL("http://akka.io")))
+      component.topDomains ! sampleTweet.copy(urls = Seq(new URL("http://scala-lang.org")))
+      component.topDomains ! sampleTweet.copy(urls = Seq(new URL("http://playframework.com")))
+
+      val result = TwitterSample.topDomains().apply(FakeRequest())
+
+      status(result) must be(OK)
+      contentType(result) mustBe Some("application/json")
+      (contentAsJson(result) \ "top_domains").as[Set[String]] mustBe (
+        Set("google.com", "akka.io", "scala-lang.org", "playframework.com", "twitter.com")
+      )
+    }
+
+    "return URL stats" in {
+      component.urls ! sampleTweet.copy(urls = Nil)
+      component.urls ! sampleTweet.copy(urls = Nil)
+      component.urls ! sampleTweet.copy(urls = Seq(new URL("http://google.com"), new URL("http://pic.twitter.com")))
+      component.urls ! sampleTweet.copy(urls = Seq(new URL("http://akka.io")))
+      component.urls ! sampleTweet.copy(urls = Seq(new URL("http://scala-lang.org")))
+      component.urls ! sampleTweet.copy(urls = Seq(new URL("http://playframework.com")))
+
+      val result = TwitterSample.urlStats().apply(FakeRequest())
+
+      status(result) must be(OK)
+      contentType(result) mustBe Some("application/json")
+      (contentAsJson(result) \ "percent_containing_urls").as[Double] mustBe 4/6.0
+      (contentAsJson(result) \ "percent_containing_photo_urls").as[Double] mustBe 1/6.0
     }
 
   }

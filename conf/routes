@@ -6,8 +6,7 @@ GET     /total                      controllers.TwitterSample.total
 GET     /average                    controllers.TwitterSample.average
 GET     /emojis                     controllers.TwitterSample.emojis(count: Int ?= 10)
 GET     /topHashtags                controllers.TwitterSample.topHashtags
-GET     /percentContainingUrl       controllers.TwitterSample.percentContainingUrl
-GET     /percentContainingPhotoUrl  controllers.TwitterSample.percentContainingPhotoUrl
+GET     /urlStats                   controllers.TwitterSample.urlStats
 GET     /topDomains                 controllers.TwitterSample.topDomains
 
 # Map static resources from the /public folder to the /assets URL path
