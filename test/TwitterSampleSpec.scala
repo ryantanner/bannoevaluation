@@ -90,8 +90,8 @@ class TwitterSampleSpec extends PlaySpec with OneAppPerSuite {
       status(result) must be(OK)
       contentType(result) mustBe Some("application/json")
       (contentAsJson(result) \ "top_hashtags").as[Set[String]] mustBe (
-          Set("akka", "scala", "banno")
-        )
+        Set("akka", "scala", "banno")
+      )
     }
 
   }

@@ -52,3 +52,12 @@ object TopHashtags {
     (__ \ "top_hashtags").write[Set[String]].contramap(_.heavyHitters)
 
 }
+
+case class TopDomains(heavyHitters: Set[String])
+
+object TopDomains {
+
+  implicit val writes: Writes[TopDomains] = 
+    (__ \ "top_domains").write[Set[String]].contramap(_.heavyHitters)
+
+}

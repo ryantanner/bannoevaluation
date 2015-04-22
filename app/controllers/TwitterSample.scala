@@ -24,14 +24,6 @@ object TwitterSample extends Controller {
 
   implicit val timeout = Timeout(5 seconds)
 
-  def request[T : ClassTag : Writes](ref: ActorRef): Future[Result] = {
-    for {
-      data <- (ref ? RequestData).mapTo[T]
-    } yield {
-      Ok(Json.toJson(data))
-    }
-  }
-
   def total = Action.async {
     request[TotalTweets](actors.totalTweets)
   }
@@ -41,6 +33,7 @@ object TwitterSample extends Controller {
   }
 
   def emojis(count: Int) = Action.async {
+    // Can't use the request helper for requests with parameters
     for {
       stats <- (actors.emojis ? RequestEmojis(count)).mapTo[EmojiStats]
     } yield {
@@ -62,6 +55,14 @@ object TwitterSample extends Controller {
 
   def topDomains = Action {
     NotImplemented
+  }
+
+  def request[T : ClassTag : Writes](ref: ActorRef): Future[Result] = {
+    for {
+      data <- (ref ? RequestData).mapTo[T]
+    } yield {
+      Ok(Json.toJson(data))
+    }
   }
 
 }

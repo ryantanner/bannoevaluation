@@ -9,7 +9,7 @@ import models._
 
 object Samples {
 
-  val sampleTweet = Tweet(42l, DateTime.now, Seq("akka"), Nil, "Banno Evaluation using #akka")
+  val sampleTweet = Tweet(42l, DateTime.now, Seq("akka"), Seq("http://scala-lang.org"), "Banno Evaluation using #akka")
 
   val emojis = EmojiManager.getAll().asScala.take(10).toList
 
