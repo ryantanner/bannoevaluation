@@ -19,8 +19,8 @@ class ActorPlugin(implicit app: Application) extends Plugin {
   lazy val totalTweets: ActorRef = Akka.system.actorOf(TotalTweetsActor.props)
   //val url: ActorRef = Actor.noSender
 
-  lazy val streamProcessor: ActorRef = 
-    Akka.system.actorOf(StreamProcessorActor.props(
+  lazy val streamProducer: ActorRef = 
+    Akka.system.actorOf(StreamProducerActor.props(
       totalTweets,
       averageTweets
     ))
