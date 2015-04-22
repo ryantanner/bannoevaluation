@@ -11,6 +11,8 @@ libraryDependencies ++= Seq(
   anorm,
   cache,
   ws,
+  "com.twitter" %% "algebird-core" % "0.9.0",
+  "com.vdurmont" % "emoji-java" % "1.1.0",
   "org.scalatestplus" %% "play" % "1.1.0" % "test",
   "com.typesafe.akka" %% "akka-testkit" % "2.3.4" % "test"
 )

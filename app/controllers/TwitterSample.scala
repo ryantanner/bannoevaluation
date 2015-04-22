@@ -40,16 +40,16 @@ object TwitterSample extends Controller {
     request[AverageTweets](actors.averageTweets)
   }
 
-  def topEmojis = Action {
-    NotImplemented
+  def emojis(count: Int) = Action.async {
+    for {
+      stats <- (actors.emojis ? RequestEmojis(count)).mapTo[EmojiStats]
+    } yield {
+      Ok(Json.toJson(stats))
+    }
   }
 
-  def percentContainingEmojis = Action {
-    NotImplemented
-  }
-
-  def topHashtags = Action {
-    NotImplemented
+  def topHashtags = Action.async {
+    request[TopHashtags](actors.hashtags)
   }
 
   def percentContainingUrl = Action {

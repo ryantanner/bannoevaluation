@@ -12,17 +12,17 @@ class ActorPlugin(implicit app: Application) extends Plugin {
 
   lazy val averageTweets: ActorRef = Akka.system.actorOf(AverageTweetsActor.props)
 
-/*
-  val emojis: ActorRef = Actor.noSender
-  val hashtag: ActorRef = Actor.noSender
-  */
+  lazy val emojis: ActorRef = Akka.system.actorOf(EmojiActor.props)
+  lazy val hashtags: ActorRef = Akka.system.actorOf(HashtagActor.props)
   lazy val totalTweets: ActorRef = Akka.system.actorOf(TotalTweetsActor.props)
   //val url: ActorRef = Actor.noSender
 
   lazy val streamProducer: ActorRef = 
     Akka.system.actorOf(StreamProducerActor.props(
       totalTweets,
-      averageTweets
+      averageTweets,
+      emojis,
+      hashtags
     ))
 
   override def onStart() = {

@@ -43,11 +43,7 @@ object StallWarning {
 
 }
 
-case class Tweet(id: Long, createdAt: DateTime, hashtags: Seq[String], urls: Seq[String], text: String) extends TwitterStreamItem {
-
-  def emojis: Seq[String] = Nil
-
-}
+case class Tweet(id: Long, createdAt: DateTime, hashtags: Seq[String], urls: Seq[String], text: String) extends TwitterStreamItem
 
 object Tweet {
 

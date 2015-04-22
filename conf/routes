@@ -4,8 +4,7 @@
 
 GET     /total                      controllers.TwitterSample.total
 GET     /average                    controllers.TwitterSample.average
-GET     /topEmojis                  controllers.TwitterSample.topEmojis
-GET     /percentContainingEmojis    controllers.TwitterSample.percentContainingEmojis
+GET     /emojis                     controllers.TwitterSample.emojis(count: Int ?= 10)
 GET     /topHashtags                controllers.TwitterSample.topHashtags
 GET     /percentContainingUrl       controllers.TwitterSample.percentContainingUrl
 GET     /percentContainingPhotoUrl  controllers.TwitterSample.percentContainingPhotoUrl

@@ -1,6 +1,8 @@
 package models.protocol
 
 import play.api.libs.json._
+import play.api.libs.json.Reads._
+import play.api.libs.functional.syntax._ 
 
 case object RequestData
 
@@ -26,5 +28,27 @@ object AverageTweets {
       "average_per_hour"   -> averageTweets.perHour
     )
   }
+
+}
+
+case class RequestEmojis(count: Int)
+
+case class EmojiStats(percentContaining: Double, topEmojis: Map[String, Int])
+
+object EmojiStats {
+
+  implicit val writes = (
+    (__ \ "percent_containing_emojis").write[Double] ~
+    (__ \ "top_emojis").write[Map[String, Int]]
+  )(unlift(EmojiStats.unapply))
+
+}
+
+case class TopHashtags(heavyHitters: Set[String])
+
+object TopHashtags {
+
+  implicit val writes: Writes[TopHashtags] = 
+    (__ \ "top_hashtags").write[Set[String]].contramap(_.heavyHitters)
 
 }
