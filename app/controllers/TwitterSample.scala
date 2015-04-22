@@ -6,10 +6,13 @@ import play.api.mvc._
 import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
+import akka.actor.ActorRef
 import akka.pattern.ask
 import akka.util.Timeout
 
+import scala.concurrent.Future
 import scala.concurrent.duration._
+import scala.reflect.ClassTag
 
 import plugins._
 import models._
@@ -21,20 +24,20 @@ object TwitterSample extends Controller {
 
   implicit val timeout = Timeout(5 seconds)
 
-  def total = Action.async {
+  def request[T : ClassTag : Writes](ref: ActorRef): Future[Result] = {
     for {
-      total <- (actors.totalTweets ? RequestData).mapTo[TotalTweets]
+      data <- (ref ? RequestData).mapTo[T]
     } yield {
-      Ok(Json.toJson(total))
+      Ok(Json.toJson(data))
     }
   }
 
+  def total = Action.async {
+    request[TotalTweets](actors.totalTweets)
+  }
+
   def average = Action.async {
-    for {
-      average <- (actors.averageTweets ? RequestData).mapTo[AverageTweets]
-    } yield {
-      Ok(Json.toJson(average))
-    }
+    request[AverageTweets](actors.averageTweets)
   }
 
   def topEmojis = Action {

@@ -48,7 +48,7 @@ class TwitterSampleSpec extends PlaySpec with OneAppPerSuite {
       contentAsJson(result) must be (Json.obj(
         "average_per_second" -> 1.5,
         "average_per_minute" -> 90.0,
-        "average_per_hour" -> 5400.0,
+        "average_per_hour" -> 5400.0
       ))
     }
 
