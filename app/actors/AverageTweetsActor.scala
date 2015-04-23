@@ -25,7 +25,7 @@ class AverageTweetsActor extends TweetProcessor {
   * forever is a tradeoff based on two facts:
   *   1. Twitter's API does not guarantee order, so keeping a 
   *      running average per period would be inaccurate
-  *   2. This map takes rougly 1MB memory per day (12 bytes per pair,
+  *   2. This map takes roughly 1MB memory per day (12 bytes per pair,
   *      60 pairs per minute, 60 pairs per hour, 24 hours per day), so
   *      even after a week, this would take less than 7.5MB.
   *
