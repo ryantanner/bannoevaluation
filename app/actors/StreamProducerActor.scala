@@ -52,18 +52,6 @@ object StreamProducerActor {
     case JsSuccess(item, _) => item
   }
 
-  def collectTweets(implicit ec: ExecutionContext) = Enumeratee.collect[TwitterStreamItem] {
-    case t: Tweet => t
-  }
-
-  def collectDisconnects(implicit ec: ExecutionContext) = Enumeratee.collect[TwitterStreamItem] {
-    case d: Disconnect => d
-  }
-
-  def collectStallWarnings(implicit ec: ExecutionContext) = Enumeratee.collect[TwitterStreamItem] {
-    case s: StallWarning => s
-  }
-
 }
 
 class StreamProducerActor(subscribers: Seq[ActorRef]) extends Actor with ActorLogging {
