@@ -53,7 +53,7 @@ object StreamProducerActor {
   }
 
   def collectTweets(implicit ec: ExecutionContext) = Enumeratee.collect[TwitterStreamItem] {
-    case t: Tweet => println(t); t
+    case t: Tweet => t
   }
 
   def collectDisconnects(implicit ec: ExecutionContext) = Enumeratee.collect[TwitterStreamItem] {
