@@ -38,7 +38,7 @@ class AverageTweetsActor extends Actor with ActorLogging {
   val tweetsPerSeconds = MutableMap.empty[Second, Count].withDefaultValue(0)
 
   def update(tweet: Tweet) = {
-    val secondsSinceGenesis = (tweet.createdAt.getMillis / 1000) 
+    val secondsSinceGenesis = (tweet.timestamp / 1000) 
 
     tweetsPerSeconds.update(secondsSinceGenesis,
       tweetsPerSeconds(secondsSinceGenesis) + 1)
@@ -56,6 +56,11 @@ class AverageTweetsActor extends Actor with ActorLogging {
   def receive = {
     case tweet: Tweet => update(tweet)
     case RequestData  => sender ! AverageTweets(average)
+    case Log => log.info(s"""
+      Average tweets per second: $average
+      Average tweets per minute: ${average * 60}
+      Average tweets per hour:   ${average * 60 * 60}
+    """)
   }
 
 }

@@ -29,8 +29,8 @@ import scala.collection.immutable
 import models.protocol._
 import helpers.Samples._
 
-class AverageTweetsActorSpec
-  extends TestKit(ActorSystem("AverageTweetsActorSpec"))
+class HashtagActorSpec
+  extends TestKit(ActorSystem("HashtagActorSpec"))
   with DefaultTimeout with ImplicitSender with ScalaFutures
   with WordSpecLike with Matchers with BeforeAndAfterAll {
 
@@ -43,35 +43,38 @@ class AverageTweetsActorSpec
     shutdown()
   }
  
-  "An AverageTweetsActor" should {
+  "An HashtagActor" should {
     "start with 0 tweets" in {
-      val averageTweetsRef = TestActorRef[AverageTweetsActor]
+      val hashtagRef = TestActorRef[HashtagActor]
 
       within(500 millis) {
-        averageTweetsRef ! RequestData
-        expectMsg(AverageTweets(0.0))
+        hashtagRef ! RequestData
+        expectMsg(TopHashtags(Set.empty[String]))
       }
     }
 
-    "return 1.0 after 1 tweet is received" in {
-      val averageTweetsRef = TestActorRef[AverageTweetsActor]
+    "return 1 hashtag after 1 tweet is received" in {
+      val hashtagRef = TestActorRef[HashtagActor]
 
       within(500 millis) {
-        averageTweetsRef ! sampleTweet
-        averageTweetsRef ! RequestData
-        expectMsg(AverageTweets(1.0))
+        hashtagRef ! sampleTweet
+        hashtagRef ! RequestData
+        expectMsg(TopHashtags(Set("akka")))
       }
     }
 
-    "return 1.5 after 3 tweets received over 2 seconds" in {
-      val averageTweetsRef = TestActorRef[AverageTweetsActor]
+    "return top hashtags (roughly)" in {
+      val hashtagRef = TestActorRef[HashtagActor]
 
       within(500 millis) {
-        averageTweetsRef ! sampleTweet
-        averageTweetsRef ! sampleTweet.copy(timestamp = sampleTweet.timestamp - 1000)
-        averageTweetsRef ! sampleTweet.copy(timestamp = sampleTweet.timestamp - 1000)
-        averageTweetsRef ! RequestData
-        expectMsg(AverageTweets(1.5))
+        hashtagRef ! sampleTweet
+        hashtagRef ! sampleTweet.copy(urls = Nil)
+        hashtagRef ! sampleTweet.copy(hashtags = Seq("akka", "scala"))
+        hashtagRef ! sampleTweet.copy(hashtags = Seq("banno", "scala"))
+        hashtagRef ! sampleTweet.copy(hashtags = Seq("battlestargalactica", "akka"))
+        hashtagRef ! sampleTweet.copy(hashtags = Seq("banno", "akka"))
+        hashtagRef ! RequestData
+        expectMsg(TopHashtags(Set("akka", "scala", "banno", "battlestargalactica")))
       }
     }
 

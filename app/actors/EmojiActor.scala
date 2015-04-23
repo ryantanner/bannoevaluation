@@ -2,8 +2,6 @@ package actors
 
 import akka.actor._
 
-import play.api.Logger
-
 import com.vdurmont.emoji._
 
 import scala.collection.mutable.{ Map => MutableMap }
@@ -19,11 +17,13 @@ object EmojiActor {
 
 case class Emoji(codepoint: String)
 
-class EmojiActor extends Actor {
+class EmojiActor extends Actor with ActorLogging {
 
   var totalTweets = 0
   var tweetsWithEmojis = 0
 
+  // I chose not to use a count-min-sketch here because the maximum number of keys is bounded
+  // with a relatively small value (~800), so there isn't much concern about memory usage
   val emojiCounts = MutableMap.empty[Emoji, Int].withDefaultValue(0)
 
   def emojisFor(tweet: Tweet): Seq[Emoji] = {
@@ -55,6 +55,11 @@ class EmojiActor extends Actor {
         percentContainingEmojis,
         emojiCounts.toList.sortBy(_._2).reverse.take(count).map { case (emoji, count) => emoji.codepoint -> count }.toMap
       )
+    case Log => log.info(s"""
+      Percent of tweets containing emojis: $percentContainingEmojis
+      Top 10 emojis:
+        ${emojiCounts.toList.sortBy(_._2).reverse.take(10).map(_._1.codepoint).mkString(", ")}
+    """)
   }
 
 }

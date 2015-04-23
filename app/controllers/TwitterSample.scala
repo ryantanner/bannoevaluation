@@ -33,12 +33,7 @@ object TwitterSample extends Controller {
   }
 
   def emojis(count: Int) = Action.async {
-    // Can't use the request helper for requests with parameters
-    for {
-      stats <- (actors.emojis ? RequestEmojis(count)).mapTo[EmojiStats]
-    } yield {
-      Ok(Json.toJson(stats))
-    }
+    request[EmojiStats](actors.emojis, RequestEmojis(count))
   }
 
   def topHashtags = Action.async {
@@ -53,9 +48,9 @@ object TwitterSample extends Controller {
     request[TopDomains](actors.topDomains)
   }
 
-  private def request[T : ClassTag : Writes](ref: ActorRef): Future[Result] = {
+  private def request[T : ClassTag : Writes](ref: ActorRef, req: Any = RequestData): Future[Result] = {
     for {
-      data <- (ref ? RequestData).mapTo[T]
+      data <- (ref ? req).mapTo[T]
     } yield {
       Ok(Json.toJson(data))
     }

@@ -45,18 +45,29 @@ object StallWarning {
 
 }
 
-case class Tweet(id: Long, createdAt: DateTime, hashtags: Seq[String], urls: Seq[URL], text: String) extends TwitterStreamItem {
+case class Hashtag(text: String)
+
+object Hashtag {
+
+  implicit val rds = Json.reads[Hashtag]
+
+}
+
+case class Tweet(id: Long, timestamp: Long, hashtags: Seq[String], urls: Seq[URL], text: String) extends TwitterStreamItem {
   lazy val domains = urls.map(_.getHost)
 }
 
 object Tweet {
 
-  implicit val urlReads: Reads[URL] = of[String].map(new URL(_))
+  implicit val urlReads: Reads[URL] = 
+    (__ \ "expanded_url").read[String].map(new URL(_))
+
+  val hashtagText = (__ \ "text").read[String]
 
   implicit val rds: Reads[Tweet] = (
     (__ \ "id").read[Long] and
-    (__ \ "created_at").read[DateTime] and
-    (__ \ "entities" \ "hashtags").read[Seq[String]] and
+    (__ \ "timestamp_ms").read[String].map(_.toLong) and
+    (__ \ "entities" \ "hashtags").read[Seq[String]](seq(hashtagText)) and
     (__ \ "entities" \ "urls").read[Seq[URL]] and
     (__ \ "text").read[String]
   )(Tweet.apply _)

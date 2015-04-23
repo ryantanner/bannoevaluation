@@ -7,6 +7,8 @@ import play.api.libs.json._
 
 import java.net.URL
 
+import org.joda.time._
+
 import controllers._
 import models._
 import plugins._
@@ -41,8 +43,8 @@ class TwitterSampleSpec extends PlaySpec with OneAppPerSuite {
 
     "return averages" in {
       component.averageTweets ! sampleTweet
-      component.averageTweets ! sampleTweet.copy(createdAt = sampleTweet.createdAt.minusSeconds(1))
-      component.averageTweets ! sampleTweet.copy(createdAt = sampleTweet.createdAt.minusSeconds(1))
+      component.averageTweets ! sampleTweet.copy(timestamp = sampleTweet.timestamp - 1000)
+      component.averageTweets ! sampleTweet.copy(timestamp = sampleTweet.timestamp - 1000)
 
       val result = TwitterSample.average().apply(FakeRequest())
 

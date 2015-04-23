@@ -5,6 +5,7 @@ import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._ 
 
 case object RequestData
+case object Log
 
 case class TotalTweets(total: Int)
 

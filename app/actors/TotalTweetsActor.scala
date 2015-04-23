@@ -18,6 +18,7 @@ class TotalTweetsActor extends Actor with ActorLogging {
   def receive = {
     case _: Tweet => totalTweets += 1
     case RequestData => sender ! TotalTweets(totalTweets)
+    case Log => log.info(s"\n\tTotal tweets: $totalTweets")
   }
 
 }

@@ -2,8 +2,6 @@ package actors
 
 import akka.actor._
 
-import play.api.Logger
-
 import com.vdurmont.emoji._
 
 import scala.collection.mutable.{ Map => MutableMap }
@@ -17,7 +15,7 @@ object URLActor {
 
 }
 
-class URLActor extends Actor {
+class URLActor extends Actor with ActorLogging {
 
   var totalTweets = 0
   var tweetsWithURLs = 0
@@ -51,6 +49,10 @@ class URLActor extends Actor {
     case tweet: Tweet => update(tweet)
     case RequestData => 
       sender ! URLStats(percentContainingURLs, percentContainingPhotoURLs)
+    case Log => log.info(s"""
+      Percent of tweets containing URLs: $percentContainingURLs
+      Percent of tweets containing photo URLs: $percentContainingPhotoURLs
+    """)
   }
 
 }
