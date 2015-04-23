@@ -17,7 +17,9 @@ object EmojiActor {
 
 case class Emoji(codepoint: String)
 
-class EmojiActor extends Actor with ActorLogging {
+class EmojiActor extends TweetProcessor {
+
+  val name = "EmojiActor"
 
   var totalTweets = 0
   var tweetsWithEmojis = 0
@@ -30,7 +32,7 @@ class EmojiActor extends Actor with ActorLogging {
     tweet.text.split("\\s+").filter(EmojiManager.isEmoji).map(Emoji.apply _)
   }
 
-  def update(tweet: Tweet) = { 
+  def process(tweet: Tweet) = { 
     val emojis = emojisFor(tweet)
 
     totalTweets += 1
@@ -48,14 +50,16 @@ class EmojiActor extends Actor with ActorLogging {
     else
       tweetsWithEmojis / (totalTweets * 1.0)
 
-  def receive = {
-    case tweet: Tweet => update(tweet)
+  val receiveRequests: Actor.Receive = {
     case RequestEmojis(count) => 
       sender ! EmojiStats(
         percentContainingEmojis,
         emojiCounts.toList.sortBy(_._2).reverse.take(count).map { case (emoji, count) => emoji.codepoint -> count }.toMap
       )
-    case Log => log.info(s"""
+  }
+
+  def logStats {
+    log.info(s"""
       Percent of tweets containing emojis: $percentContainingEmojis
       Top 10 emojis:
         ${emojiCounts.toList.sortBy(_._2).reverse.take(10).map(_._1.codepoint).mkString(", ")}

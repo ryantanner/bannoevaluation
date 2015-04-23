@@ -13,7 +13,9 @@ object AverageTweetsActor {
 
 }
 
-class AverageTweetsActor extends Actor with ActorLogging {
+class AverageTweetsActor extends TweetProcessor {
+
+  val name = "AverageTweetsActor"
 
   type Second = Long
   type Count  = Int
@@ -37,7 +39,7 @@ class AverageTweetsActor extends Actor with ActorLogging {
   */
   val tweetsPerSeconds = MutableMap.empty[Second, Count].withDefaultValue(0)
 
-  def update(tweet: Tweet) = {
+  def process(tweet: Tweet) = {
     val secondsSinceGenesis = (tweet.timestamp / 1000) 
 
     tweetsPerSeconds.update(secondsSinceGenesis,
@@ -53,10 +55,12 @@ class AverageTweetsActor extends Actor with ActorLogging {
       }.sum / (tweetsPerSeconds.size * 1.0)
   }
 
-  def receive = {
-    case tweet: Tweet => update(tweet)
-    case RequestData  => sender ! AverageTweets(average)
-    case Log => log.info(s"""
+  val receiveRequests: Actor.Receive = {
+    case RequestData => sender ! AverageTweets(average)
+  }
+
+  def logStats {
+    log.info(s"""
       Average tweets per second: $average
       Average tweets per minute: ${average * 60}
       Average tweets per hour:   ${average * 60 * 60}

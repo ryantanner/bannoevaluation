@@ -8,3 +8,5 @@ GET     /emojis                     controllers.TwitterSample.emojis(count: Int 
 GET     /topHashtags                controllers.TwitterSample.topHashtags
 GET     /urlStats                   controllers.TwitterSample.urlStats
 GET     /topDomains                 controllers.TwitterSample.topDomains
+
+POST    /stop                       controllers.TwitterSample.stop

@@ -9,15 +9,14 @@ import play.api.libs.oauth._
 import play.api.libs.iteratee._
 import play.api.libs.iteratee.Concurrent._
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ Promise, ExecutionContext }
 import scala.util.{ Try, Success }
 
 import models._
+import protocol._
 
 object StreamProducerActor {
 
-  case class Stop(reason: String)
-  case object Finalize
   case object Subscribe
 
   def props(subscribers: ActorRef*) = Props(classOf[StreamProducerActor], subscribers)
@@ -75,19 +74,12 @@ class StreamProducerActor(subscribers: Seq[ActorRef]) extends Actor with ActorLo
   def subscribe: Enumerator[TwitterStreamItem] = {
     val (key, token) = credentials
 
-    val twitterStream =
-      requestTwitterSample(key, token) through
+    requestTwitterSample(key, token) through
       parseByteArray through
       takeMessages through
       filterBlankLines through
       parseJson through
       validateJson
-
-    twitterStream(processMessage)
-
-    twitterStream onDoneEnumerating {
-      self ! Stop
-    }
   }
 
   def credentials: (ConsumerKey, RequestToken) = {
@@ -144,10 +136,32 @@ class StreamProducerActor(subscribers: Seq[ActorRef]) extends Actor with ActorLo
     }
   }
 
+  def stopWhenDone[E](enumerator: Enumerator[E]): (Enumerator[E], Promise[Unit]) = {
+    val p = Promise[Unit]
+    val e = enumerator.flatMap { input =>
+      if (p.isCompleted)
+        Enumerator.eof[E]
+      else
+        Enumerator(input)
+    } onDoneEnumerating {
+      log.info("Enumerator stopped")
+    }
+    (e, p)
+  }
+
   def receive = {
-    case Subscribe => subscribe
+    case Subscribe => 
+      val (stream, stopSignal) = stopWhenDone(subscribe)
+
+      stream(processMessage)
+
+      context.become(subscribed(stream, stopSignal))
+  }
+
+  def subscribed(stream: Enumerator[TwitterStreamItem], stopSignal: Promise[Unit]): Actor.Receive = {
     case Stop(reason) =>
       log.info(s"Stopping Twitter stream: $reason")
+      stopSignal.success(())
       subscribers.foreach(s => s ! Finalize)
       context.become(stopped)
   }

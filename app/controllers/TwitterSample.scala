@@ -48,6 +48,11 @@ object TwitterSample extends Controller {
     request[TopDomains](actors.topDomains)
   }
 
+  def stop = Action {
+    actors.stop()
+    Ok
+  }
+
   private def request[T : ClassTag : Writes](ref: ActorRef, req: Any = RequestData): Future[Result] = {
     for {
       data <- (ref ? req).mapTo[T]

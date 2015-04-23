@@ -11,14 +11,22 @@ object TotalTweetsActor {
 
 }
 
-class TotalTweetsActor extends Actor with ActorLogging {
+class TotalTweetsActor extends TweetProcessor {
+
+  val name = "TotalTweetsActor"
 
   var totalTweets = 0
 
-  def receive = {
-    case _: Tweet => totalTweets += 1
+  def process(tweet: Tweet) = {
+    totalTweets += 1
+  }
+
+  val receiveRequests: Actor.Receive = {
     case RequestData => sender ! TotalTweets(totalTweets)
-    case Log => log.info(s"\n\tTotal tweets: $totalTweets")
+  }
+
+  def logStats {
+    log.info(s"\n      Total tweets: $totalTweets")
   }
 
 }

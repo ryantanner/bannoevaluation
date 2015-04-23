@@ -6,6 +6,8 @@ import play.api.libs.functional.syntax._
 
 case object RequestData
 case object Log
+case object Finalize
+case class Stop(reason: String)
 
 case class TotalTweets(total: Int)
 

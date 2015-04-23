@@ -23,6 +23,7 @@ import play.api.libs.json._
 
 import org.joda.time.DateTime
 
+import scala.concurrent._
 import scala.concurrent.duration._
 import scala.collection.immutable
 

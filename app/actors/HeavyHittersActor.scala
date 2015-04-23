@@ -9,7 +9,8 @@ import java.net.URL
 import models._
 import protocol._
 
-abstract class HeavyHitterActor[R](name: String) extends Actor with ActorLogging {
+abstract class HeavyHitterActor[R](val name: String) extends TweetProcessor {
+
   // I have no idea why Algebird hasn't put this in their library
   implicit val hash: CMSHasher[String] = new CMSHasher[String] {
     def hash(a: Int, b: Int, width: Int)(x: String) = {
@@ -26,11 +27,16 @@ abstract class HeavyHitterActor[R](name: String) extends Actor with ActorLogging
 
   var topK: TopCMS[String] = approxTopK(Nil) // Initially returns TopPctCMSMonoid.zero[String]
 
-  def receive = {
-    case tweet: Tweet => 
-      topK = topK ++ approxTopK(extractK(tweet))
-    case RequestData  => sender ! response(topK.heavyHitters)
-    case Log => log.info(s"""
+  def process(tweet: Tweet) = {
+    topK = topK ++ approxTopK(extractK(tweet))
+  }
+
+  val receiveRequests: Actor.Receive = {
+    case RequestData => sender ! response(topK.heavyHitters)
+  }
+
+  def logStats {
+    log.info(s"""
       Top $name heavy hitters:
         ${topK.heavyHitters.mkString(", ")}
     """)

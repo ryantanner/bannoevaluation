@@ -32,14 +32,23 @@ class ActorPlugin(implicit app: Application) extends Plugin {
       urls
     ))
 
+  lazy val periodcLogging = Akka.system.scheduler.schedule(30 seconds, 30 seconds)(tellSubscribersToLogStatus)(Akka.system.dispatcher)
+
   override def onStart() = {
     streamProducer ! StreamProducerActor.Subscribe
 
-    Akka.system.scheduler.schedule(30 seconds, 30 seconds)(tellSubscribersToLogStatus)(Akka.system.dispatcher)
+    periodcLogging
   }
 
   override def onStop() = {
     tellSubscribersToLogStatus
+
+    periodcLogging.cancel()
+  }
+
+  def stop() {
+    streamProducer ! Stop("requested by user")
+    periodcLogging.cancel()
   }
 
   def tellSubscribersToLogStatus = 

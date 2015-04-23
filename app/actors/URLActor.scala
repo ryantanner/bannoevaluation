@@ -15,13 +15,15 @@ object URLActor {
 
 }
 
-class URLActor extends Actor with ActorLogging {
+class URLActor extends TweetProcessor {
+
+  val name = "URLActor"
 
   var totalTweets = 0
   var tweetsWithURLs = 0
   var tweetsWithPhotoURLs = 0
 
-  def update(tweet: Tweet) = { 
+  def process(tweet: Tweet) = { 
     totalTweets += 1
 
     if (tweet.urls.nonEmpty)
@@ -45,14 +47,16 @@ class URLActor extends Actor with ActorLogging {
     else
       tweetsWithPhotoURLs / (totalTweets * 1.0)
 
-  def receive = {
-    case tweet: Tweet => update(tweet)
+  def logStats {
+    log.info(f"""
+      Percent of tweets containing URLs: $percentContainingURLs%2.5f%%
+      Percent of tweets containing photo URLs: $percentContainingPhotoURLs%2.5f%%
+    """)
+  }
+
+  val receiveRequests: Actor.Receive = {
     case RequestData => 
       sender ! URLStats(percentContainingURLs, percentContainingPhotoURLs)
-    case Log => log.info(s"""
-      Percent of tweets containing URLs: $percentContainingURLs
-      Percent of tweets containing photo URLs: $percentContainingPhotoURLs
-    """)
   }
 
 }
