@@ -6,3 +6,6 @@ To run locally, copy `conf/deploy.sample.conf` to `conf/deploy.conf` and update 
 View `conf/routes` for the available HTTP endpoints (e.g., `http://localhost:9000/average`).  In addition, statistics will be logged to STDOUT every 30 seconds.
 
 Tests can be run with `sbt test`.
+
+Send a POST request to `http://localhost:9000/stop` to stop streaming
+from Twitter (but the server will remain up).
