@@ -49,7 +49,7 @@ class StreamProducerActorSpec
   "A StreamProducerActor" should {
     "forward tweets to subscribers" in {
       within(500 millis) {
-        Enumerator(sampleTweet: TwitterStreamItem)(streamProducer.publishTweets)
+        Enumerator(sampleTweet: TwitterStreamItem)(streamProducer.processMessage)
         expectMsg(sampleTweet)
       }
     }
@@ -74,7 +74,7 @@ class StreamProducerActorSpec
 
     "stream JSON" in {
       val e = Enumerator(sampleJson)
-      e.through(validateJson)(streamProducer.publishTweets)
+      e.through(validateJson)(streamProducer.processMessage)
       expectMsgType[Tweet]
     }
 

@@ -1,4 +1,4 @@
-name := """play-scala"""
+name := """banno-eval"""
 
 version := "1.0-SNAPSHOT"
 
